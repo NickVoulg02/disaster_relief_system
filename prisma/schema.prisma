@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  citizen
+  volunteer
+  admin
+}
+
+enum DemandType {
+  request
+  donation
+}
+
+enum TaskStatus {
+  Complete
+  Not_Complete @map("Not Complete")
+}
+
+model User {
+  user_id   Int        @id @default(autoincrement())
+  user_name String     @db.VarChar(50)
+  user_pass String     @db.VarChar(100)
+  user_type UserType
+  citizen   Citizen?
+  volunteer Volunteer?
+
+  @@map("users")
+}
+
+model Citizen {
+  cit_id     Int      @id
+  cit_name   String   @db.VarChar(50)
+  cit_laname String   @db.VarChar(50)
+  cit_long   Float    @db.Float
+  cit_lat    Float    @db.Float
+  cit_number String   @db.VarChar(30)
+  user       User     @relation(fields: [cit_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  demands    Demand[]
+
+  @@map("citizen")
+}
+
+model Volunteer {
+  vol_id   Int       @id
+  vol_name String    @db.VarChar(50)
+  vol_lname String   @db.VarChar(50)
+  vol_long Float     @db.Float
+  vol_lat  Float     @db.Float
+  vol_num  String    @db.VarChar(30)
+  user     User      @relation(fields: [vol_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  vehicles Vehicle[]
+  accepts  Accept[]
+
+  @@map("volunteer")
+}
+
+model Category {
+  cat_id   Int       @id @default(autoincrement())
+  cat_name String    @db.VarChar(50)
+  products Product[]
+
+  @@map("categories")
+}
+
+model Base {
+  id         Int        @id
+  longtitude Float      @db.Float
+  latitude   Float      @db.Float
+  base_loads BaseLoad[]
+
+  @@map("base")
+}
+
+model Product {
+  pr_id         Int            @id @default(autoincrement())
+  pr_name       String         @db.VarChar(50)
+  pr_cat_id     Int
+  detail_name   String?        @db.VarChar(50)
+  detail_value  Int?
+  category      Category       @relation(fields: [pr_cat_id], references: [cat_id], onDelete: Cascade, onUpdate: Cascade)
+  base_loads    BaseLoad[]
+  demands       Demand[]
+  veh_loads     VehLoad[]
+  announcements Announcement[]
+
+  @@map("product")
+}
+
+model BaseLoad {
+  asdaa       Int      @id @default(autoincrement())
+  base_id     Int?     @default(1)
+  pr_id       Int?
+  pr_quantity Int?
+  base        Base?    @relation(fields: [base_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product     Product? @relation(fields: [pr_id], references: [pr_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("base_load")
+}
+
+model Demand {
+  dem_id     Int        @id @default(autoincrement())
+  dem_cit_id Int
+  dem_pr_id  Int
+  dem_value  Int?
+  dem_type   DemandType
+  citizen    Citizen    @relation(fields: [dem_cit_id], references: [cit_id], onDelete: Cascade, onUpdate: Cascade)
+  product    Product    @relation(fields: [dem_pr_id], references: [pr_id], onDelete: Cascade, onUpdate: Cascade)
+  tasks      Task[]
+
+  @@map("demands")
+}
+
+model Task {
+  task_id              Int        @id @default(autoincrement())
+  task_dem_id          Int
+  task_submission_date DateTime   @default(now()) @db.DateTime(0)
+  task_acceptance_date DateTime?  @db.DateTime(0)
+  task_completion_date DateTime?  @db.DateTime(0)
+  task_status          TaskStatus @default(Not_Complete)
+  demand               Demand     @relation(fields: [task_dem_id], references: [dem_id], onDelete: Cascade, onUpdate: Cascade)
+  accepts              Accept[]
+
+  @@map("task")
+}
+
+model Accept {
+  acc_vol_id  Int
+  acc_task_id Int
+  volunteer   Volunteer @relation(fields: [acc_vol_id], references: [vol_id], onDelete: Cascade, onUpdate: Cascade)
+  task        Task      @relation(fields: [acc_task_id], references: [task_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([acc_vol_id, acc_task_id])
+  @@map("accepts")
+}
+
+model Vehicle {
+  veh_id       Int       @id @default(autoincrement())
+  veh_vol_id   Int
+  veh_task_num Int       @default(0)
+  longtitude   Float     @db.Float
+  latitude     Float     @db.Float
+  volunteer    Volunteer @relation(fields: [veh_vol_id], references: [vol_id], onDelete: Cascade, onUpdate: Cascade)
+  veh_loads    VehLoad[]
+
+  @@map("vehicle")
+}
+
+model VehLoad {
+  veh_load_id   Int
+  veh_load_prod Int
+  pr_quantity   Int
+  vehicle       Vehicle @relation(fields: [veh_load_id], references: [veh_id], onDelete: Cascade, onUpdate: Cascade)
+  product       Product @relation(fields: [veh_load_prod], references: [pr_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([veh_load_id, veh_load_prod])
+  @@map("veh_load")
+}
+
+model Announcement {
+  ann_id    Int     @id @default(autoincrement())
+  ann_pr_id Int
+  ann_value Int?
+  product   Product @relation(fields: [ann_pr_id], references: [pr_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("announcements")
+}
+

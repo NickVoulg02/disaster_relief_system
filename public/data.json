@@ -1,0 +1,82 @@
+[
+  {
+    "pr_name": "Water",
+    "pr_id": 1,
+    "pr_cat_id": 1,
+    "detail_name": "Bottles",
+    "detail_value": 20,
+    "cat_name": "FOOD"
+  },
+  {
+    "pr_name": "Milk",
+    "pr_id": 2,
+    "pr_cat_id": 1,
+    "detail_name": "Bottles",
+    "detail_value": 15,
+    "cat_name": "FOOD"
+  },
+  {
+    "pr_name": "Winter Gloves",
+    "pr_id": 3,
+    "pr_cat_id": 4,
+    "detail_name": "Pair",
+    "detail_value": 10,
+    "cat_name": "CLOTHING"
+  },
+  {
+    "pr_name": "Winter Socks",
+    "pr_id": 4,
+    "pr_cat_id": 4,
+    "detail_name": "Pair",
+    "detail_value": 12,
+    "cat_name": "CLOTHING"
+  },
+  {
+    "pr_name": "Hand Sanitizer",
+    "pr_id": 5,
+    "pr_cat_id": 2,
+    "detail_name": "Bottle",
+    "detail_value": 15,
+    "cat_name": "HYGIENE"
+  },
+  {
+    "pr_name": "Hand Wipes",
+    "pr_id": 6,
+    "pr_cat_id": 2,
+    "detail_name": "Pack",
+    "detail_value": 15,
+    "cat_name": "HYGIENE"
+  },
+  {
+    "pr_name": "Pasta",
+    "pr_id": 7,
+    "pr_cat_id": 1,
+    "detail_name": "Pack",
+    "detail_value": 20,
+    "cat_name": "FOOD"
+  },
+  {
+    "pr_name": "Toothbrush",
+    "pr_id": 8,
+    "pr_cat_id": 2,
+    "detail_name": "Pack",
+    "detail_value": 10,
+    "cat_name": "HYGIENE"
+  },
+  {
+    "pr_name": "Depon",
+    "pr_id": 9,
+    "pr_cat_id": 3,
+    "detail_name": "Pack",
+    "detail_value": 15,
+    "cat_name": "MEDICAL_SUPPLIES"
+  },
+  {
+    "pr_name": "Toothpaste",
+    "pr_id": 10,
+    "pr_cat_id": 2,
+    "detail_name": "Tube",
+    "detail_value": 10,
+    "cat_name": "HYGIENE"
+  }
+]

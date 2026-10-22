@@ -1,0 +1,13 @@
+{
+  "/login/page": "app/login/page.js",
+  "/volunteer/page": "app/volunteer/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/api/auth/me/route": "app/api/auth/me/route.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/citizen/page": "app/citizen/page.js",
+  "/api/admin/products/route": "app/api/admin/products/route.js",
+  "/api/admin/volunteers/route": "app/api/admin/volunteers/route.js",
+  "/api/admin/map/route": "app/api/admin/map/route.js",
+  "/api/auth/logout/route": "app/api/auth/logout/route.js",
+  "/api/admin/statistics/route": "app/api/admin/statistics/route.js"
+}

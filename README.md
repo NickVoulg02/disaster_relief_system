@@ -1,81 +1,87 @@
-# Web Project 2024
+# Disaster Relief Coordination System (Next.js + TypeScript + Prisma)
 
 ## 📌 Overview
 
-This project is a **collaborative system** designed to help coordinate **aid requests** and **offerings** following a natural disaster (e.g., flood, earthquake). 
+This project is a **modern full-stack rework** of the collaborative Disaster Relief Coordination System (originally built with PHP, vanilla JS, HTML/CSS, and MySQL). It coordinates **citizen aid requests**, **citizen donations**, **volunteer rescue vehicles**, and a **central warehouse base** following a natural disaster.
 
-Its main features:
-- Citizens can **submit requests** for needed items (water, food, medicine, etc.)  
-- Citizens can **offer surplus items** for donation  
-- Vehicles belonging to Civil Protection / volunteer rescuers are used to **pick up / deliver** items  
-- A central base (warehouse) holds donated items and can issue alerts when supplies are low  
-- A map-based interface shows all requests and offers, allowing rescuers to take up tasks  
-- Citizens can access the system via mobile, declare their needs or what they can donate
-
----
-
-## 🛠️ Features
-
-- Registration / login for citizens and rescuers  
-- Interface for submitting help requests or offers  
-- Task assignment: rescuer vehicles are assigned to pickup / delivery tasks  
-- Dashboard / map view showing current requests/offers and vehicle availability  
-- Notifications for base supply shortages
+### ✨ Modernized Tech Stack
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router, Full-stack TypeScript, React 18)
+- **Database & ORM**: MySQL / MariaDB + [Prisma ORM](https://www.prisma.io/)
+- **Styling & Icons**: Tailwind CSS + Lucide Icons
+- **Maps & Geolocation**: [Leaflet](https://leafletjs.com/) + Haversine geodesic distance validation
+- **Analytics**: [Chart.js](https://www.chartjs.org/) (`react-chartjs-2`)
+- **Authentication**: Stateless HTTP-only JWT session cookies (`jose`)
 
 ---
 
-## 📁 Contents of the Repository
+## 🛠️ Core Features by Role
 
-| Folder/File | Purpose |
-|-------------|---------|
-| `index.php` | Main entry / homepage or controller for web routing |
-| `DATABASE.sql` | Database schema and seed data |
-| `1084625,1084626,1084628.docx` / `.pdf` | Possibly project documentation or design documents |
-| `.htaccess` | Configuration for URL rewriting / server settings |
-| `errors/` | Error handling / error pages |
-| `test/` | Testing scripts or demo data |
-| `README.md` | This file |
+### 1. Base Administrator (`/admin`)
+- **Base Items & Announcements**:
+  - Manage Product Storage Catalogue (add new products, edit product details/stock, import/export `data.json`).
+  - Transfer stock from Storage to Base (`Add to Base`), return stock from Base to Storage (`Remove from Available`), or remove damaged stock (`Remove Entirely`).
+  - Create new product categories dynamically.
+  - Publish and delete shortage announcements for citizens.
+- **Map, Inventory Overview & Statistics**:
+  - Interactive Leaflet Map displaying the draggable **Base Warehouse**, **Volunteer Vehicles** (with live cargo load), **Accepted/Pending Requests**, **Accepted/Pending Offers**, and **Task Connection Lines**, with toggleable visibility filters.
+  - Unified Inventory Status Table across the Base and all Vehicles with category filter checkboxes (`ALL`, `FOOD`, `HYGIENE`, `MEDICAL_SUPPLIES`, `CLOTHING`, etc.).
+  - Service Statistics Pie Chart breaking down Completed vs. Incomplete Requests and Donations across selectable time ranges (`Last Day`, `Last Week`, `Last Month`, `Last 6 Months`, `Last Year`, `All Time`).
+- **Volunteer Account Management**:
+  - Register new Volunteer accounts and automatically provision their rescue vehicle and map coordinates.
+
+### 2. Volunteer Rescuer (`/volunteer`)
+- **Interactive Navigation Map**:
+  - Drag and drop your rescue vehicle marker to update your real-time coordinates (`volunteer` and `vehicle` tables).
+  - Click any pending Citizen Request or Offer marker on the map to **Accept Task** (up to **4 active tasks** per vehicle).
+  - View red polylines connecting your vehicle to your accepted tasks.
+- **Base Cargo Loading & Unloading**:
+  - Enforces the **$\le 100\text{ m}$ Haversine distance rule** from the Base Warehouse before allowing cargo loading or unloading.
+- **Active Tasks Panel**:
+  - View assigned Citizen details, phone number, product, quantity, and live distance in meters.
+  - **Complete** tasks when within **$\le 50\text{ m}$** of the citizen (automatically deducting requested items from vehicle cargo or adding donated items to vehicle cargo) or **Cancel** tasks to return them to the pending pool.
+
+### 3. Citizen (`/citizen`)
+- **Requesting a Product**:
+  - Browse products by category or use the interactive autocomplete search box to request supplies for your family members.
+- **Request History**:
+  - Track submission, volunteer acceptance, and completion timestamps for all your requests.
+- **Base Announcements & Donations**:
+  - View active Base shortage announcements, pledge donations, and manage or cancel pending donations in your **Donation History**.
 
 ---
 
-## 🧭 Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### 1. Configure MySQL Connection
+Ensure your MySQL / XAMPP server is running (default XAMPP port `3307` or `3306`) and check `.env`:
+```env
+DATABASE_URL="mysql://root:Thedarkknight1@localhost:3307/disaster_supply_database"
+JWT_SECRET="disaster-relief-secret-key-2024-upatras"
+```
 
-- Web server with PHP support (e.g., Apache, Nginx + PHP)  
-- MySQL or compatible DBMS  
-- Access to configure `.htaccess` if URL rewriting is used  
+### 2. Install Dependencies & Seed the Database
+```bash
+npm install
+npm run db:push
+npm run db:seed
+```
 
-### Installation Steps
+### 3. Start the Development Server
+```bash
+npm run dev
+```
+Open `http://localhost:3000` in your browser.
 
-1. Clone the project:
+---
 
-   ```bash
-   git clone https://github.com/NickVoulg02/Web_Project_2024.git
-   cd Web_Project_2024
+## 🔑 Default Seed Accounts (from `DATABASE.sql`)
 
-2. Import the database:
-- Use DATABASE.sql to create the necessary tables/data
+| Role | Username | Password |
+|------|----------|----------|
+| **Admin** | `nikosvoulg` | `thedarkknight` |
+| **Volunteer** | `markkennei` | `hgfnf6543` |
+| **Volunteer** | `ginorton` | `gffg5tr` |
+| **Citizen** | `emmo` | `ytrfgbgf` |
+| **Citizen** | `georgerin` | `65433rthgr` |
 
-3. Configure your web server:
-- Set up the document root to point to this project folder
-- Enable .htaccess or otherwise handle routing, if used
-- Set appropriate permissions for folders if needed
-
-4. Update configuration files (if any) with your database credentials
-5. Open the application via your browser
-
-## 🎯 Goals & Use Cases
-- Speed up matching between people in need and people who want to help in disaster zones
-- Visualize on a map the geographic distribution of needs/offers for better planning
-- Allow volunteers / rescuers to manage logistics (picking up or delivering items)
-- Provide a centralized platform to track resources and allocate help efficiently
-
-## 🛠️ Tech Stack
-- Frontend: HTML, CSS, JavaScript
-- Backend: PHP
-- Database: MySQL (or similar SQL RDBMS)
-
-## 🧪 Testing & Errors
-- There is an errors/ folder for handling known error conditions
-- Use test/ folder for running test scenarios or demo content
+> Legacy PHP, SQL, and documentation files are preserved in the [`legacy/`](./legacy) directory for reference.

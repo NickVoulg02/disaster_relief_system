@@ -1,0 +1,105 @@
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background: #18191A;
+	font-size: 17px;
+}
+
+
+button{
+	box-shadow: 0 0 1px #000000;
+	cursor: pointer;
+	font-size:14px;
+	color: #212c52;
+	padding: 10px; 
+    margin: 10px 0px; 
+    border: none; 
+}
+
+.main {
+	width: 70%;
+	max-width: 1000px; /* Adjust the maximum width as needed */
+	margin: 20px auto;
+	padding: 20px;
+	background-color: #f0f0f0;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+	/* Set a fixed height and make it scrollable */
+	height: auto; /* Adjust the height as needed */
+	overflow-y: auto;
+}
+
+.block {
+	text-align:center;
+	margin-bottom: 12px;
+	padding: 5px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.tasks-content {
+	font-size: 15px;
+}
+
+.logout{
+	width:10%;
+	height:35px;
+	background:ffffff;
+	border:none;
+	outline: none;
+	border-radius: 40px;
+	box-shadow: 0 0 10px #000000;
+	cursor: pointer;
+	font-size:16px;
+	color: #212c52;
+	margin-top:10px;
+	margin-bottom:50px;
+
+  }
+
+.clickable{
+	cursor: pointer;
+}
+
+  .clickable:hover {
+	background-color: grey}
+
+
+.btn-group{
+	text-align: center;
+}
+
+.btn-group button {
+	background-color: #ac3b61; /* red background */
+	border: 1px solid black; /* black border */
+	color: white; /* White text */
+	padding: 10px 24px; /* Some padding */
+	cursor: pointer; /* Pointer/hand icon */
+	float: center; /* Float the buttons side by side */
+  }
+  
+  
+  /* Add a background color on hover */
+.btn-group button:hover {
+	background-color: #7a2c46;
+  }
+
+
+.signup{
+	margin-left:10px;
+	width:43%;
+	border-radius: 20px;
+	box-shadow: 0 0 2px #000000;
+}
+
+input[type=text],input[type=password]{
+		 width: 40%;
+		 padding: 12px 20px;
+		 margin: 8px 4px;
+		 border:1px solid #000000;
+		 border-radius: 17px;
+		}

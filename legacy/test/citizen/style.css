@@ -1,0 +1,108 @@
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background: #18191A;
+	font-size: 17px;
+}
+
+table, td, th{
+	border: 1px solid black; 
+	border-collapse: collapse;
+}
+table{
+	width:100%
+}
+
+td,th{
+	text-align: center;
+}
+
+thead{
+    background-color: #ac3b61;
+    color: #ffffff;
+    text-align: left;
+}
+
+button{
+	box-shadow: 0 0 1px #000000;
+	cursor: pointer;
+	font-size:14px;
+	color: #212c52;
+}
+
+.main {
+	width: 80%;
+	max-width: 1000px; /* Adjust the maximum width as needed */
+	margin: 20px auto;
+	padding: 20px;
+	background-color: #f0f0f0;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+	/* Set a fixed height and make it scrollable */
+	height: auto; /* Adjust the height as needed */
+	overflow-y: auto;
+}
+
+.block {
+	margin-bottom: 15px;
+	padding: 8px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.tasks-content {
+	font-size: 15px;
+}
+
+.autocomplete {
+	position: relative;
+	display: inline-block;
+  
+  }
+  .autocomplete-items {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+  }
+  .autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+  }
+
+  .logout{
+	width:10%;
+	height:35px;
+	background:ffffff;
+	border:none;
+	outline: none;
+	border-radius: 40px;
+	box-shadow: 0 0 10px #000000;
+	cursor: pointer;
+	font-size:16px;
+	color: #212c52;
+	margin-top:10px;
+	margin-bottom:50px;
+
+  }
+
+  .clickable{
+	cursor: pointer;
+  }
+  .clickable:hover {background-color:#f34d84;
+	transition: 0.3s;}
+
+.button:active {
+  background-color: #8a8787;
+  transform: translateY(4px);
+}
