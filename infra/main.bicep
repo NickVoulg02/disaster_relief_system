@@ -49,7 +49,7 @@ module mysql './modules/mysql.bicep' = {
 // Use the DATABASE_URL secret from GitHub Secrets if provided, or auto-construct from Step 2 MySQL outputs
 var resolvedDatabaseUrl = !empty(databaseUrl)
   ? databaseUrl
-  : 'mysql://${dbAdminLogin}:${uriComponent(dbAdminPassword)}@${mysql.outputs.mysqlFqdn}:3306/${mysql.outputs.databaseName}?sslaccept=strict'
+  : 'mysql://${dbAdminLogin}:${uriComponent(dbAdminPassword)}@${mysql.outputs.mysqlFqdn}:3306/${mysql.outputs.databaseName}?sslaccept=accept_invalid_certs&connect_timeout=15'
 
 // Step 3: Deploy Azure Key Vault, store DATABASE-URL and JWT-SECRET, and assign RBAC role
 module keyVault './modules/keyvault.bicep' = {

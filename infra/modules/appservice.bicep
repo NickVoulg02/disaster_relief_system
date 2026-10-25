@@ -51,7 +51,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   }
 }
 
-// 2. Azure App Service (Native Node.js 20 LTS + System-Assigned Managed Identity + VNet Integration)
+// 2. Azure App Service (Native Node.js 22 LTS + System-Assigned Managed Identity + VNet Integration)
 resource webApp 'Microsoft.Web/sites@2023-12-01' = {
   name: webAppName
   location: location
@@ -65,33 +65,11 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
     virtualNetworkSubnetId: appSubnetId
     vnetRouteAllEnabled: true // Routes outbound traffic through snet-app and nsg-drs-app
     siteConfig: {
-      linuxFxVersion: 'NODE|20-lts'
+      linuxFxVersion: 'NODE|22-lts'
       alwaysOn: appServicePlanSku != 'F1'
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       appCommandLine: 'node server.js'
-      appSettings: [
-        {
-          name: 'NODE_ENV'
-          value: 'production'
-        }
-        {
-          name: 'PORT'
-          value: '8080'
-        }
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'false'
-        }
-        {
-          name: 'DATABASE_URL'
-          value: '@Microsoft.KeyVault(SecretUri=${databaseUrlSecretUri})'
-        }
-        {
-          name: 'JWT_SECRET'
-          value: '@Microsoft.KeyVault(SecretUri=${jwtSecretUri})'
-        }
-      ]
     }
   }
 }
@@ -104,6 +82,23 @@ resource webAppKeyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2
     roleDefinitionId: keyVaultSecretsUserRoleId
     principalId: webApp.identity.principalId
     principalType: 'ServicePrincipal'
+  }
+}
+
+// 4. App Settings applied AFTER the Key Vault RBAC role assignment exists so @Microsoft.KeyVault(...) resolves
+resource webAppSettings 'Microsoft.Web/sites/config@2023-12-01' = {
+  parent: webApp
+  name: 'appsettings'
+  dependsOn: [
+    webAppKeyVaultRoleAssignment
+  ]
+  properties: {
+    NODE_ENV: 'production'
+    PORT: '8080'
+    WEBSITE_HOSTNAME_DEFAULT: webApp.properties.defaultHostName
+    SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
+    DATABASE_URL: '@Microsoft.KeyVault(SecretUri=${databaseUrlSecretUri})'
+    JWT_SECRET: '@Microsoft.KeyVault(SecretUri=${jwtSecretUri})'
   }
 }
 

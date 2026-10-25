@@ -9,11 +9,11 @@ on:
 env:
   AZURE_RESOURCE_GROUP: rg-disaster-relief
   AZURE_LOCATION: centralus
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '22.x'
 
 jobs:
   provision-and-deploy:
-    name: Provision Bicep Infra (Key Vault + MySQL + App Service) & Deploy Next.js
+    name: Provision Bicep Infra & Deploy Next.js
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -33,6 +33,24 @@ jobs:
           az group create \
             --name "${{ env.AZURE_RESOURCE_GROUP }}" \
             --location "${{ env.AZURE_LOCATION }}"
+
+      - name: Upgrade MySQL Flexible Server
+        run: |
+          EXISTING_MYSQL=$(az mysql flexible-server list \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --query "[0].{name:name, version:version}" -o json)
+          if [ -n "$EXISTING_MYSQL" ] && [ "$EXISTING_MYSQL" != "null" ]; then
+            SERVER_NAME=$(echo "$EXISTING_MYSQL" | jq -r '.name')
+            SERVER_VERSION=$(echo "$EXISTING_MYSQL" | jq -r '.version')
+            if [[ "$SERVER_VERSION" == 8.0* ]]; then
+              echo "Upgrading $SERVER_NAME from MySQL $SERVER_VERSION to 8.4..."
+              az mysql flexible-server upgrade \
+                --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+                --name "$SERVER_NAME" \
+                --version 8.4 \
+                --yes
+            fi
+          fi
 
       - name: Provision Infrastructure & Push Secrets to Key Vault via Bicep
         id: bicep
@@ -68,7 +86,7 @@ jobs:
           npm ci
           npx prisma generate
           npm run build
-          cp -r public .next/standalone/public
+          cp -r public/. .next/standalone/public/
           cp -r .next/static .next/standalone/.next/static
 
       - name: Package Standalone Build for Azure App Service
@@ -83,6 +101,12 @@ jobs:
             --name "${{ steps.bicep.outputs.webAppName }}" \
             --src-path release.zip \
             --type zip
+
+      - name: Restart Web App to refresh Key Vault Secret References
+        run: |
+          az webapp restart \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ steps.bicep.outputs.webAppName }}"
 
       - name: Output Live URL
         run: |

@@ -30,7 +30,7 @@ resource mysqlServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
     tier: 'Burstable'
   }
   properties: {
-    version: '8.0.21'
+    version: '8.4'
     administratorLogin: dbAdminLogin
     administratorLoginPassword: dbAdminPassword
     storage: {
