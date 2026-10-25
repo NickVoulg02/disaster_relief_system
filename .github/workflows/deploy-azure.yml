@@ -13,7 +13,7 @@ env:
 
 jobs:
   provision-and-deploy:
-    name: Provision Bicep Infra (Key Vault + MySQL + App Service) & Deploy Next.js
+    name: Provision Bicep Infra & Deploy Next.js
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -34,7 +34,14 @@ jobs:
             --name "${{ env.AZURE_RESOURCE_GROUP }}" \
             --location "${{ env.AZURE_LOCATION }}"
 
-      - name: Provision Infrastructure & Push Secrets to Key Vault via Bicep
+          # If the Resource Group was previously deleted, purge any soft-deleted Key Vault in centralus so Bicep can recreate it cleanly
+          DELETED_KV=$(az keyvault list-deleted --query "[?properties.location=='${{ env.AZURE_LOCATION }}'].name" -o tsv)
+          for kv in $DELETED_KV; do
+            echo "Purging soft-deleted Key Vault: $kv"
+            az keyvault purge --name "$kv" --location "${{ env.AZURE_LOCATION }}" || true
+          done
+
+      - name: Provision Infrastructure & Push Secrets to Key Vault
         id: bicep
         env:
           DB_ADMIN_PASSWORD: ${{ secrets.DB_ADMIN_PASSWORD }}
@@ -84,8 +91,11 @@ jobs:
             --src-path release.zip \
             --type zip
 
-      - name: Restart Web App to refresh Key Vault Secret References
+      - name: Refresh Key Vault Secret References & Restart Web App
         run: |
+          SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          az rest --method post \
+            --url "https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${{ env.AZURE_RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ steps.bicep.outputs.webAppName }}/config/configreferences/appsettings/refresh?api-version=2022-03-01" || true
           az webapp restart \
             --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
             --name "${{ steps.bicep.outputs.webAppName }}"

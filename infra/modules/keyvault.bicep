@@ -60,7 +60,7 @@ resource jwtSecretResource 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   }
 }
 
-// Optional RBAC Role Assignment: Grant the deploying User "Key Vault Secrets Officer"
+// Grant the deploying User "Key Vault Secrets Officer"
 resource adminSecretsOfficerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(adminPrincipalId)) {
   name: guid(keyVault.id, adminPrincipalId, keyVaultSecretsOfficerRoleId)
   scope: keyVault
@@ -72,6 +72,6 @@ resource adminSecretsOfficerRole 'Microsoft.Authorization/roleAssignments@2022-0
 }
 
 output keyVaultName string = keyVault.name
-output databaseUrlSecretUri string = databaseUrlSecret.properties.secretUri
-output jwtSecretUri string = jwtSecretResource.properties.secretUri
+output databaseUrlSecretUri string = databaseUrlSecret.properties.secretUriWithVersion
+output jwtSecretUri string = jwtSecretResource.properties.secretUriWithVersion
 
