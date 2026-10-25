@@ -14,9 +14,7 @@
 .env.*
 !.env.example
 
-# Azure Bicep parameter files with secrets & compiled ARM JSON artifacts
-infra/*.bicepparam
-!infra/*.bicepparam.example
+# Compiled ARM JSON artifacts
 infra/**/*.json
 
 # Legacy PHP/SQL archive & report documents
