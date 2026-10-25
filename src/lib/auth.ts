@@ -1,8 +1,13 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 
-const secretKey = process.env.JWT_SECRET || 'disaster-relief-secret-key-2024-upatras';
-const encodedKey = new TextEncoder().encode(secretKey);
+function getEncodedSecret(): Uint8Array {
+  const secretKey = process.env.JWT_SECRET;
+  if (!secretKey) {
+    throw new Error('JWT_SECRET environment variable is not set.');
+  }
+  return new TextEncoder().encode(secretKey);
+}
 
 export interface SessionUser {
   userId: number;
@@ -15,12 +20,12 @@ export async function createSessionToken(payload: SessionUser): Promise<string> 
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(encodedKey);
+    .sign(getEncodedSecret());
 }
 
 export async function verifySessionToken(token: string): Promise<SessionUser | null> {
   try {
-    const { payload } = await jwtVerify(token, encodedKey, {
+    const { payload } = await jwtVerify(token, getEncodedSecret(), {
       algorithms: ['HS256'],
     });
     return {
@@ -39,4 +44,3 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   if (!token) return null;
   return verifySessionToken(token);
 }
-

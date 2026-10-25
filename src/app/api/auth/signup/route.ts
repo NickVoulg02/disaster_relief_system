@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createSessionToken } from '@/lib/auth';
+import { ensureDatabaseInitialized } from '@/lib/db-init';
 
 export async function POST(request: Request) {
   try {
+    await ensureDatabaseInitialized();
     const body = await request.json();
     const { username, password, firstName, lastName, phone, latitude, longitude } = body;
 
