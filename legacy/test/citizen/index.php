@@ -1,1 +1,0 @@
-<?php header("Location: /test/citizen/civ3_test.php");?>

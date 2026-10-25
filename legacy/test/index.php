@@ -1,1 +1,0 @@
-<?php header("Location: /test/signup/form.php");?>
