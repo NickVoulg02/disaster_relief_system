@@ -11,7 +11,7 @@ This project is a full-stack Disaster Relief Coordination System built with Next
 - **Maps & Geolocation**: [Leaflet](https://leafletjs.com/) + Haversine geodesic distance validation
 - **Analytics**: [Chart.js](https://www.chartjs.org/) (`react-chartjs-2`)
 - **Authentication**: Stateless HTTP-only JWT session cookies (`jose`) + Next.js Edge Middleware RBAC
-- **Cloud Infrastructure & CI/CD**: Azure Bicep (`centralus`), Azure App Service (Linux Node 22 LTS), Azure Database for MySQL Flexible Server (MySQL 8.4), Azure Key Vault (RBAC), Virtual Network Isolation, and GitHub Actions
+- **Cloud Infrastructure & CI/CD**: Azure Bicep (`centralus`), Azure App Service (Linux Node 22 LTS), Azure Database for MySQL Flexible Server (MySQL 8.0), Azure Key Vault (RBAC), Virtual Network Isolation, and GitHub Actions
 
 ---
 
@@ -130,7 +130,7 @@ Pushing to the `main` branch triggers [`.github/workflows/deploy-azure.yml`](./.
 1. **Network Isolation (`infra/modules/network.bicep`)**:
    - Provisions `vnet-drs` (`10.0.0.0/16`) with delegated subnets `snet-app` (`10.0.1.0/24`) and `snet-db` (`10.0.2.0/24`), Network Security Groups (`nsg-drs-app`, `nsg-drs-db`) restricting inbound port `3306` exclusively to `snet-app`, and a Private DNS Zone (`privatelink.mysql.database.azure.com`).
 2. **Database (`infra/modules/mysql.bicep`)**:
-   - Provisions an Azure Database for MySQL Flexible Server (`Standard_B1s`, MySQL `8.4`) inside `snet-db` with public network access disabled and creates `disaster_supply_database`.
+   - Provisions an Azure Database for MySQL Flexible Server (`Standard_B1s`, MySQL `8.0.21`) inside `snet-db` with public network access disabled and creates `disaster_supply_database`.
 3. **Secret Management (`infra/modules/keyvault.bicep`)**:
    - Provisions an RBAC-enabled Azure Key Vault and stores `DATABASE-URL` (constructed automatically from the provisioned MySQL FQDN) and `JWT-SECRET`.
 4. **Compute & Managed Identity (`infra/modules/appservice.bicep`)**:

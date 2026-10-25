@@ -13,7 +13,7 @@ env:
 
 jobs:
   provision-and-deploy:
-    name: Provision Bicep Infra & Deploy Next.js
+    name: Provision Bicep Infra (Key Vault + MySQL + App Service) & Deploy Next.js
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -33,24 +33,6 @@ jobs:
           az group create \
             --name "${{ env.AZURE_RESOURCE_GROUP }}" \
             --location "${{ env.AZURE_LOCATION }}"
-
-      - name: Upgrade MySQL Flexible Server
-        run: |
-          EXISTING_MYSQL=$(az mysql flexible-server list \
-            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
-            --query "[0].{name:name, version:version}" -o json)
-          if [ -n "$EXISTING_MYSQL" ] && [ "$EXISTING_MYSQL" != "null" ]; then
-            SERVER_NAME=$(echo "$EXISTING_MYSQL" | jq -r '.name')
-            SERVER_VERSION=$(echo "$EXISTING_MYSQL" | jq -r '.version')
-            if [[ "$SERVER_VERSION" == 8.0* ]]; then
-              echo "Upgrading $SERVER_NAME from MySQL $SERVER_VERSION to 8.4..."
-              az mysql flexible-server upgrade \
-                --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
-                --name "$SERVER_NAME" \
-                --version 8.4 \
-                --yes
-            fi
-          fi
 
       - name: Provision Infrastructure & Push Secrets to Key Vault via Bicep
         id: bicep
