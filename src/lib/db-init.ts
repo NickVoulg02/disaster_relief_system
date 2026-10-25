@@ -159,7 +159,7 @@ export async function ensureDatabaseInitialized(): Promise<void> {
       { user_id: 8, user_name: 'nikosvoulg', user_pass: 'thedarkknight', user_type: 'admin' },
       { user_id: 9, user_name: 'aggelos', user_pass: 'hggfrs', user_type: 'citizen' },
     ];
-    await prisma.user.createMany({ data: usersData });
+    await prisma.user.createMany({ data: usersData, skipDuplicates: true });
 
     await prisma.volunteer.createMany({
       data: [
@@ -167,6 +167,7 @@ export async function ensureDatabaseInitialized(): Promise<void> {
         { vol_id: 3, vol_name: 'Marc', vol_lname: 'Kein', vol_long: 21.7322, vol_lat: 38.2462, vol_num: '654357' },
         { vol_id: 4, vol_name: 'Louise', vol_lname: 'Peterson', vol_long: 21.7389, vol_lat: 38.2485, vol_num: '6543565' },
       ],
+      skipDuplicates: true,
     });
 
     await prisma.citizen.createMany({
@@ -177,6 +178,7 @@ export async function ensureDatabaseInitialized(): Promise<void> {
         { cit_id: 7, cit_name: 'Jonas', cit_laname: 'Burgmann', cit_long: 21.7325, cit_lat: 38.2430, cit_number: '7654352' },
         { cit_id: 9, cit_name: 'Aggelos', cit_laname: 'Voulgaris', cit_long: 21.7369, cit_lat: 38.2469, cit_number: '6971662770' },
       ],
+      skipDuplicates: true,
     });
 
     await prisma.category.createMany({
@@ -186,6 +188,7 @@ export async function ensureDatabaseInitialized(): Promise<void> {
         { cat_id: 3, cat_name: 'MEDICAL_SUPPLIES' },
         { cat_id: 4, cat_name: 'CLOTHING' },
       ],
+      skipDuplicates: true,
     });
 
     await prisma.product.createMany({
@@ -201,10 +204,13 @@ export async function ensureDatabaseInitialized(): Promise<void> {
         { pr_id: 9, pr_name: 'Depon', pr_cat_id: 3, detail_name: 'Pack', detail_value: 15 },
         { pr_id: 10, pr_name: 'Toothpaste', pr_cat_id: 2, detail_name: 'Tube', detail_value: 10 },
       ],
+      skipDuplicates: true,
     });
 
-    await prisma.base.create({
-      data: { id: 1, longtitude: 21.7351, latitude: 38.2462 },
+    await prisma.base.upsert({
+      where: { id: 1 },
+      update: {},
+      create: { id: 1, longtitude: 21.7351, latitude: 38.2462 },
     });
 
     await prisma.baseLoad.createMany({
@@ -214,6 +220,7 @@ export async function ensureDatabaseInitialized(): Promise<void> {
         { base_id: 1, pr_id: 7, pr_quantity: 6 },
         { base_id: 1, pr_id: 9, pr_quantity: 5 },
       ],
+      skipDuplicates: true,
     });
 
     const demandsData: { dem_id: number; dem_cit_id: number; dem_pr_id: number; dem_value: number; dem_type: DemandType }[] = [
@@ -225,7 +232,7 @@ export async function ensureDatabaseInitialized(): Promise<void> {
       { dem_id: 6, dem_cit_id: 5, dem_pr_id: 7, dem_value: 2, dem_type: 'donation' },
       { dem_id: 7, dem_cit_id: 7, dem_pr_id: 9, dem_value: 3, dem_type: 'donation' },
     ];
-    await prisma.demand.createMany({ data: demandsData });
+    await prisma.demand.createMany({ data: demandsData, skipDuplicates: true });
 
     const now = new Date();
     await prisma.task.createMany({
@@ -238,6 +245,7 @@ export async function ensureDatabaseInitialized(): Promise<void> {
         { task_id: 6, task_dem_id: 6, task_submission_date: new Date(now.getTime() - 48 * 3600 * 1000), task_status: TaskStatus.Not_Complete },
         { task_id: 7, task_dem_id: 7, task_submission_date: now, task_status: TaskStatus.Not_Complete },
       ],
+      skipDuplicates: true,
     });
 
     await prisma.vehicle.createMany({
@@ -246,6 +254,7 @@ export async function ensureDatabaseInitialized(): Promise<void> {
         { veh_id: 2, veh_vol_id: 3, veh_task_num: 0, longtitude: 21.7322, latitude: 38.2462 },
         { veh_id: 3, veh_vol_id: 4, veh_task_num: 0, longtitude: 21.7389, latitude: 38.2485 },
       ],
+      skipDuplicates: true,
     });
 
     await prisma.announcement.createMany({
@@ -255,6 +264,7 @@ export async function ensureDatabaseInitialized(): Promise<void> {
         { ann_id: 3, ann_pr_id: 7, ann_value: 2 },
         { ann_id: 4, ann_pr_id: 9, ann_value: 2 },
       ],
+      skipDuplicates: true,
     });
   }
 
