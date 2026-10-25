@@ -1,0 +1,89 @@
+name: Deploy Disaster Relief System to Azure (centralus)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AZURE_RESOURCE_GROUP: rg-disaster-relief
+  AZURE_LOCATION: centralus
+  NODE_VERSION: '20.x'
+
+jobs:
+  provision-and-deploy:
+    name: Provision Bicep Infra (Key Vault + MySQL + App Service) & Deploy Next.js
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Ensure Resource Group exists in centralus
+        run: |
+          az group create \
+            --name "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --location "${{ env.AZURE_LOCATION }}"
+
+      - name: Provision Infrastructure & Push Secrets to Key Vault via Bicep
+        id: bicep
+        env:
+          DB_ADMIN_PASSWORD: ${{ secrets.DB_ADMIN_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          DEPLOYMENT_OUTPUT=$(az deployment group create \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --parameters infra/main.bicepparam \
+            --query "properties.outputs" \
+            --output json)
+
+          WEBAPP_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.webAppName.value')
+          WEBAPP_URL=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.webAppUrl.value')
+          KEYVAULT_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.keyVaultName.value')
+
+          echo "webAppName=$WEBAPP_NAME" >> $GITHUB_OUTPUT
+          echo "webAppUrl=$WEBAPP_URL" >> $GITHUB_OUTPUT
+          echo "keyVaultName=$KEYVAULT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies & Build Next.js Standalone Application
+        env:
+          DATABASE_URL: "mysql://placeholder:placeholder@localhost:3306/disaster_supply_database"
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          npm ci
+          npx prisma generate
+          npm run build
+          cp -r public .next/standalone/public
+          cp -r .next/static .next/standalone/.next/static
+
+      - name: Package Standalone Build for Azure App Service
+        run: |
+          cd .next/standalone
+          zip -r ../../release.zip .
+
+      - name: Deploy Next.js Package to Azure App Service
+        run: |
+          az webapp deploy \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ steps.bicep.outputs.webAppName }}" \
+            --src-path release.zip \
+            --type zip
+
+      - name: Output Live URL
+        run: |
+          echo "Deployment complete! Live URL: ${{ steps.bicep.outputs.webAppUrl }}"
