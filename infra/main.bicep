@@ -1,7 +1,7 @@
 targetScope = 'resourceGroup'
 
-@description('Azure region for all resources')
-param location string = resourceGroup().location
+@description('Azure region for all resources (defaults to centralus)')
+param location string = 'centralus'
 
 @description('Project prefix used for naming resources')
 param projectPrefix string = 'drs'
@@ -14,14 +14,14 @@ param dbAdminLogin string = 'drsadmin'
 param dbAdminPassword string
 
 @secure()
-@description('Optional explicit DATABASE_URL override. If empty, it is automatically built from the provisioned MySQL server.')
+@description('DATABASE_URL secret injected from GitHub Secrets into Azure Key Vault. If empty, auto-constructed from the provisioned MySQL server.')
 param databaseUrl string = ''
 
 @secure()
-@description('JWT secret key stored in Key Vault and used to sign session cookies')
+@description('JWT_SECRET injected from GitHub Secrets into Azure Key Vault')
 param jwtSecret string
 
-@description('Optional Azure AD Object ID (principalId) of your user account to grant Key Vault Secrets Officer')
+@description('Optional Azure AD Object ID (principalId) of your user/service principal to grant Key Vault Secrets Officer')
 param adminPrincipalId string = ''
 
 // Step 1: Deploy Virtual Network, Subnets (snet-app, snet-db), NSGs (nsg-drs-app, nsg-drs-db), and Private DNS Zone
@@ -46,12 +46,12 @@ module mysql './modules/mysql.bicep' = {
   }
 }
 
-// Construct the final DATABASE_URL (uses the parameter from main.bicepparam if provided, or auto-builds from Step 2 MySQL outputs)
+// Use the DATABASE_URL secret from GitHub Secrets if provided, or auto-construct from Step 2 MySQL outputs
 var resolvedDatabaseUrl = !empty(databaseUrl)
   ? databaseUrl
   : 'mysql://${dbAdminLogin}:${uriComponent(dbAdminPassword)}@${mysql.outputs.mysqlFqdn}:3306/${mysql.outputs.databaseName}?sslaccept=strict'
 
-// Step 3: Deploy Azure Key Vault, store DATABASE-URL and JWT-SECRET, and assign admin RBAC role
+// Step 3: Deploy Azure Key Vault, store DATABASE-URL and JWT-SECRET, and assign RBAC role
 module keyVault './modules/keyvault.bicep' = {
   name: 'step3-keyvault-deployment'
   params: {
