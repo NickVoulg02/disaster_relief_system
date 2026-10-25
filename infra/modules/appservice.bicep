@@ -37,7 +37,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
 }
 
-// 1. Linux App Service Plan
+// Linux App Service Plan
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: appServicePlanName
   location: location
@@ -51,7 +51,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   }
 }
 
-// 2. Azure App Service (Native Node.js 22 LTS + System-Assigned Managed Identity + VNet Integration)
+// Azure App Service
 resource webApp 'Microsoft.Web/sites@2023-12-01' = {
   name: webAppName
   location: location
@@ -74,7 +74,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
   }
 }
 
-// 3. RBAC Role Assignment: Grant the App Service Managed Identity "Key Vault Secrets User" on the Key Vault
+// Grant the App Service Managed Identity "Key Vault Secrets User" on the Key Vault
 resource webAppKeyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(keyVault.id, webApp.id, keyVaultSecretsUserRoleId)
   scope: keyVault
@@ -85,7 +85,7 @@ resource webAppKeyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
-// 4. App Settings applied AFTER the Key Vault RBAC role assignment exists so @Microsoft.KeyVault(...) resolves
+// App Settings applied AFTER the Key Vault RBAC role assignment exists 
 resource webAppSettings 'Microsoft.Web/sites/config@2023-12-01' = {
   parent: webApp
   name: 'appsettings'

@@ -25,7 +25,7 @@ var keyVaultSecretsOfficerRoleId = subscriptionResourceId(
   'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
 )
 
-// 1. Azure Key Vault with RBAC Authorization enabled
+// Azure Key Vault with RBAC Authorization enabled
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
   location: location
@@ -42,7 +42,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   }
 }
 
-// 2. Store DATABASE_URL Secret in Key Vault
+// Store DATABASE_URL Secret in Key Vault
 resource databaseUrlSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   parent: keyVault
   name: 'DATABASE-URL'
@@ -51,7 +51,7 @@ resource databaseUrlSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   }
 }
 
-// 3. Store JWT_SECRET in Key Vault
+// Store JWT_SECRET in Key Vault
 resource jwtSecretResource 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   parent: keyVault
   name: 'JWT-SECRET'
@@ -60,7 +60,7 @@ resource jwtSecretResource 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   }
 }
 
-// 4. Optional RBAC Role Assignment: Grant the deploying User "Key Vault Secrets Officer"
+// Optional RBAC Role Assignment: Grant the deploying User "Key Vault Secrets Officer"
 resource adminSecretsOfficerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(adminPrincipalId)) {
   name: guid(keyVault.id, adminPrincipalId, keyVaultSecretsOfficerRoleId)
   scope: keyVault

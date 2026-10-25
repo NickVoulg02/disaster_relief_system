@@ -33,7 +33,7 @@ module network './modules/network.bicep' = {
   }
 }
 
-// Step 2: Deploy Azure Database for MySQL Flexible Server (Standard_B1s) inside snet-db
+// Deploy Azure Database for MySQL Flexible Server (Standard_B1s) inside snet-db
 module mysql './modules/mysql.bicep' = {
   name: 'step2-mysql-deployment'
   params: {
@@ -51,7 +51,7 @@ var resolvedDatabaseUrl = !empty(databaseUrl)
   ? databaseUrl
   : 'mysql://${dbAdminLogin}:${uriComponent(dbAdminPassword)}@${mysql.outputs.mysqlFqdn}:3306/${mysql.outputs.databaseName}?sslaccept=accept_invalid_certs&connect_timeout=15'
 
-// Step 3: Deploy Azure Key Vault, store DATABASE-URL and JWT-SECRET, and assign RBAC role
+// Deploy Azure Key Vault, store DATABASE-URL and JWT-SECRET, and assign RBAC role
 module keyVault './modules/keyvault.bicep' = {
   name: 'step3-keyvault-deployment'
   params: {
@@ -63,7 +63,7 @@ module keyVault './modules/keyvault.bicep' = {
   }
 }
 
-// Step 4: Deploy Azure App Service + Managed Identity + "Key Vault Secrets User" RBAC Role Assignment
+// Deploy Azure App Service + Managed Identity + "Key Vault Secrets User" RBAC Role Assignment
 module appService './modules/appservice.bicep' = {
   name: 'step4-appservice-deployment'
   params: {

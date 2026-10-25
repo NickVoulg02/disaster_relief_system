@@ -21,7 +21,7 @@ param databaseName string = 'disaster_supply_database'
 
 var serverName = 'mysql-${projectPrefix}-${uniqueString(resourceGroup().id)}'
 
-// 1. Azure Database for MySQL - Flexible Server (Private VNet Integrated)
+// Azure Database for MySQL - Flexible Server (Private VNet Integrated)
 resource mysqlServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
   name: serverName
   location: location
@@ -51,7 +51,7 @@ resource mysqlServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
   }
 }
 
-// 2. Application Database (disaster_supply_database)
+// Application Database (disaster_supply_database)
 resource mysqlDatabase 'Microsoft.DBforMySQL/flexibleServers/databases@2023-06-30' = {
   parent: mysqlServer
   name: databaseName
