@@ -1,0 +1,15 @@
+using './main.bicep'
+
+param projectPrefix = 'drs'
+param dbAdminLogin = 'drsadmin'
+param dbAdminPassword = '<REPLACE_WITH_STRONG_MYSQL_PASSWORD>'
+
+// Injected into Azure Key Vault as 'DATABASE-URL' (leave empty to auto-construct from the provisioned MySQL server)
+param databaseUrl = ''
+
+// Injected into Azure Key Vault as 'JWT-SECRET'
+param jwtSecret = '<REPLACE_WITH_STRONG_JWT_SECRET>'
+
+// Optional: Your Azure AD User Object ID (`az ad signed-in-user show --query id -o tsv`)
+param adminPrincipalId = ''
+
