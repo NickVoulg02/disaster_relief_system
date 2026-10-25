@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-// @ts-expect-error Next.js loads this stylesheet at runtime.
 import './globals.css';
 
 export const viewport: Viewport = {
