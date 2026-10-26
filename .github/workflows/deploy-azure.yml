@@ -9,7 +9,7 @@ on:
 env:
   AZURE_RESOURCE_GROUP: rg-disaster-relief
   AZURE_LOCATION: centralus
-  NODE_VERSION: '22.x'
+  NODE_VERSION: '20.x'
 
 jobs:
   provision-and-deploy:
@@ -82,12 +82,6 @@ jobs:
         run: |
           cd .next/standalone
           zip -r ../../release.zip .
-
-      - name: Refresh Key Vault Secret References on Web App
-        run: |
-          SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          az rest --method post \
-            --url "https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${{ env.AZURE_RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ steps.bicep.outputs.webAppName }}/config/configreferences/appsettings/refresh?api-version=2022-03-01" || true
 
       - name: Deploy Next.js Package to Azure App Service
         run: |

@@ -65,7 +65,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
     virtualNetworkSubnetId: appSubnetId
     vnetRouteAllEnabled: true // Routes outbound traffic through snet-app and nsg-drs-app
     siteConfig: {
-      linuxFxVersion: 'NODE|22-lts'
+      linuxFxVersion: 'NODE|20-lts'
       alwaysOn: appServicePlanSku != 'F1'
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
@@ -76,15 +76,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
           value: 'production'
         }
         {
-          name: 'HOSTNAME'
-          value: '0.0.0.0'
-        }
-        {
           name: 'PORT'
-          value: '8080'
-        }
-        {
-          name: 'WEBSITES_PORT'
           value: '8080'
         }
         {
