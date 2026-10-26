@@ -13,7 +13,7 @@ env:
 
 jobs:
   provision-and-deploy:
-    name: Provision Bicep Infra & Deploy Next.js
+    name: Provision Bicep Infra (Key Vault + MySQL + App Service) & Deploy Next.js
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -41,7 +41,7 @@ jobs:
             az keyvault purge --name "$kv" --location "${{ env.AZURE_LOCATION }}" || true
           done
 
-      - name: Provision Infrastructure & Push Secrets to Key Vault
+      - name: Provision Infrastructure & Push Secrets to Key Vault via Bicep
         id: bicep
         env:
           DB_ADMIN_PASSWORD: ${{ secrets.DB_ADMIN_PASSWORD }}
@@ -83,6 +83,12 @@ jobs:
           cd .next/standalone
           zip -r ../../release.zip .
 
+      - name: Refresh Key Vault Secret References on Web App
+        run: |
+          SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          az rest --method post \
+            --url "https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${{ env.AZURE_RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ steps.bicep.outputs.webAppName }}/config/configreferences/appsettings/refresh?api-version=2022-03-01" || true
+
       - name: Deploy Next.js Package to Azure App Service
         run: |
           az webapp deploy \
@@ -90,15 +96,6 @@ jobs:
             --name "${{ steps.bicep.outputs.webAppName }}" \
             --src-path release.zip \
             --type zip
-
-      - name: Refresh Key Vault Secret References & Restart Web App
-        run: |
-          SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          az rest --method post \
-            --url "https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${{ env.AZURE_RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ steps.bicep.outputs.webAppName }}/config/configreferences/appsettings/refresh?api-version=2022-03-01" || true
-          az webapp restart \
-            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
-            --name "${{ steps.bicep.outputs.webAppName }}"
 
       - name: Output Live URL
         run: |

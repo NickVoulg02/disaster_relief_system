@@ -61,8 +61,9 @@ export async function POST(request: Request) {
     return response;
   } catch (error: unknown) {
     console.error('Login error:', error);
+    const details = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Database or server error during login.' },
+      { error: `Database or server error during login (${details}).` },
       { status: 500 }
     );
   }

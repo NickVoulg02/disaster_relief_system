@@ -70,6 +70,36 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       appCommandLine: 'node server.js'
+      appSettings: [
+        {
+          name: 'NODE_ENV'
+          value: 'production'
+        }
+        {
+          name: 'HOSTNAME'
+          value: '0.0.0.0'
+        }
+        {
+          name: 'PORT'
+          value: '8080'
+        }
+        {
+          name: 'WEBSITES_PORT'
+          value: '8080'
+        }
+        {
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'false'
+        }
+        {
+          name: 'DATABASE_URL'
+          value: '@Microsoft.KeyVault(SecretUri=${databaseUrlSecretUri})'
+        }
+        {
+          name: 'JWT_SECRET'
+          value: '@Microsoft.KeyVault(SecretUri=${jwtSecretUri})'
+        }
+      ]
     }
   }
 }
@@ -82,23 +112,6 @@ resource webAppKeyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2
     roleDefinitionId: keyVaultSecretsUserRoleId
     principalId: webApp.identity.principalId
     principalType: 'ServicePrincipal'
-  }
-}
-
-// App Settings applied after the Key Vault RBAC role assignment exists 
-resource webAppSettings 'Microsoft.Web/sites/config@2023-12-01' = {
-  parent: webApp
-  name: 'appsettings'
-  dependsOn: [
-    webAppKeyVaultRoleAssignment
-  ]
-  properties: {
-    NODE_ENV: 'production'
-    PORT: '8080'
-    WEBSITE_HOSTNAME_DEFAULT: webApp.properties.defaultHostName
-    SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
-    DATABASE_URL: '@Microsoft.KeyVault(SecretUri=${databaseUrlSecretUri})'
-    JWT_SECRET: '@Microsoft.KeyVault(SecretUri=${jwtSecretUri})'
   }
 }
 
