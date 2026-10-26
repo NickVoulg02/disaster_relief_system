@@ -6,7 +6,7 @@ param projectPrefix string = 'drs'
 @description('Resource ID of the database subnet')
 param dbSubnetId string
 
-@description('Resource ID of the Private DNS Zone (privatelink.mysql.database.azure.com) from Step 1')
+@description('Resource ID of the Private DNS Zone')
 param privateDnsZoneId string
 
 @description('Administrator username for MySQL Flexible Server')
@@ -21,7 +21,7 @@ param databaseName string = 'disaster_supply_database'
 
 var serverName = 'mysql-${projectPrefix}-${uniqueString(resourceGroup().id)}'
 
-// Azure Database for MySQL - Flexible Server (Private VNet Integrated)
+// Azure Database for MySQL - Flexible Server 
 resource mysqlServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
   name: serverName
   location: location
@@ -51,7 +51,7 @@ resource mysqlServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
   }
 }
 
-// Application Database (disaster_supply_database)
+// Application Database
 resource mysqlDatabase 'Microsoft.DBforMySQL/flexibleServers/databases@2023-06-30' = {
   parent: mysqlServer
   name: databaseName

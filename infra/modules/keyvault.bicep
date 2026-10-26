@@ -15,11 +15,11 @@ param jwtSecret string
 @description('Optional Azure AD Object ID (principalId) of the user/admin to grant Key Vault Secrets Officer role')
 param adminPrincipalId string = ''
 
-// Key Vault names must be 3-24 alphanumeric/hyphen characters
+// Key Vault name
 var keyVaultName = take('kv-${projectPrefix}-${uniqueString(resourceGroup().id)}', 24)
 
 // Built-in Azure RBAC Role Definition IDs for Key Vault
-// Key Vault Secrets Officer:Read/Write/Delete secrets (for human admin / deployment identity)
+// Key Vault Secrets Officer:Read/Write/Delete secrets 
 var keyVaultSecretsOfficerRoleId = subscriptionResourceId(
   'Microsoft.Authorization/roleDefinitions',
   'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'

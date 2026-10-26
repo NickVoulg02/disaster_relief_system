@@ -14,17 +14,17 @@ param dbAdminLogin string = 'drsadmin'
 param dbAdminPassword string
 
 @secure()
-@description('DATABASE_URL secret injected from GitHub Secrets into Azure Key Vault. If empty, auto-constructed from the provisioned MySQL server.')
+@description('DATABASE_URL secret')
 param databaseUrl string = ''
 
 @secure()
-@description('JWT_SECRET injected from GitHub Secrets into Azure Key Vault')
+@description('JWT_SECRET')
 param jwtSecret string
 
-@description('Optional Azure AD Object ID (principalId) of your user/service principal to grant Key Vault Secrets Officer')
+@description('Optional Azure AD Object ID if your user/service principal to grant Key Vault Secrets Officer')
 param adminPrincipalId string = ''
 
-// Step 1: Deploy Virtual Network, Subnets (snet-app, snet-db), NSGs (nsg-drs-app, nsg-drs-db), and Private DNS Zone
+// Deploy Virtual Network, Subnets, NSGs, and Private DNS Zone
 module network './modules/network.bicep' = {
   name: 'step1-network-deployment'
   params: {
@@ -33,7 +33,7 @@ module network './modules/network.bicep' = {
   }
 }
 
-// Deploy Azure Database for MySQL Flexible Server (Standard_B1s) inside snet-db
+// Deploy Azure Database for MySQL Flexible Server inside snet-db
 module mysql './modules/mysql.bicep' = {
   name: 'step2-mysql-deployment'
   params: {
@@ -46,7 +46,7 @@ module mysql './modules/mysql.bicep' = {
   }
 }
 
-// Use the DATABASE_URL secret from GitHub Secrets if provided, or auto-construct from Step 2 MySQL outputs
+// Use the DATABASE_URL secret from GitHub Secrets if provided, or auto-construct MySQL outputs
 var resolvedDatabaseUrl = !empty(databaseUrl)
   ? databaseUrl
   : 'mysql://${dbAdminLogin}:${uriComponent(dbAdminPassword)}@${mysql.outputs.mysqlFqdn}:3306/${mysql.outputs.databaseName}?sslaccept=accept_invalid_certs&connect_timeout=15'
@@ -63,7 +63,7 @@ module keyVault './modules/keyvault.bicep' = {
   }
 }
 
-// Deploy Azure App Service + Managed Identity + "Key Vault Secrets User" RBAC Role Assignment
+// Deploy Azure App Service, Managed Identity, "Key Vault Secrets User" RBAC Role Assignment
 module appService './modules/appservice.bicep' = {
   name: 'step4-appservice-deployment'
   params: {

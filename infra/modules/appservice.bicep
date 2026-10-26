@@ -4,10 +4,10 @@ param location string = resourceGroup().location
 @description('Project prefix used for naming resources')
 param projectPrefix string = 'drs'
 
-@description('Resource ID of the delegated App Service subnet (snet-app) from Step 1')
+@description('Resource ID of the delegated App Service subnet')
 param appSubnetId string
 
-@description('Name of the Key Vault from Step 3 (used to scope the RBAC role assignment)')
+@description('Key Vault Name')
 param keyVaultName string
 
 @description('Key Vault Secret URI for DATABASE_URL')
@@ -16,7 +16,7 @@ param databaseUrlSecretUri string
 @description('Key Vault Secret URI for JWT_SECRET')
 param jwtSecretUri string
 
-@description('App Service Plan SKU (B1 is the cheapest tier that supports VNet Integration)')
+@description('App Service Plan SKU')
 @allowed([
   'F1'
   'B1'
@@ -26,7 +26,7 @@ param appServicePlanSku string = 'B1'
 var appServicePlanName = 'asp-${projectPrefix}-${uniqueString(resourceGroup().id)}'
 var webAppName = 'app-${projectPrefix}-${uniqueString(resourceGroup().id)}'
 
-// Built-in Azure RBAC Role ID for "Key Vault Secrets User" (Read-only access to secrets for App Service Managed Identity)
+// Built-in Azure RBAC Role ID for "Key Vault Secrets User"
 var keyVaultSecretsUserRoleId = subscriptionResourceId(
   'Microsoft.Authorization/roleDefinitions',
   '4633458b-17de-408a-b874-0445c86b69e6'
@@ -85,7 +85,7 @@ resource webAppKeyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
-// App Settings applied AFTER the Key Vault RBAC role assignment exists 
+// App Settings applied after the Key Vault RBAC role assignment exists 
 resource webAppSettings 'Microsoft.Web/sites/config@2023-12-01' = {
   parent: webApp
   name: 'appsettings'
